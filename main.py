@@ -64,33 +64,26 @@ def check_future_plans():
         return []
 
 def is_heartbeat_time():
-    """Checks if current Mountain Time matches the heartbeat schedule (8:00 AM or 12:30 PM)"""
+    """Checks if current Mountain Time matches the heartbeat schedule"""
     now = datetime.now(MY_TIMEZONE)
     
-    # Logic for 10-minute intervals:
-    # We must ensure the window is smaller than the interval (10 mins)
-    # so it only triggers ONCE per time block.
-    
-    # 8:00 AM Check (Triggers if time is 08:00 - 08:09)
+    # 8:00 AM Check (08:00 - 08:09)
     if now.hour == 8 and 0 <= now.minute < 10:
         return True
         
-    # 12:30 PM Check (Triggers if time is 12:30 - 12:39)
+    # 12:30 PM Check (12:30 - 12:39)
     if now.hour == 12 and 30 <= now.minute < 40:
         return True
         
     return False
 
 if __name__ == "__main__":
-    print(f"Checking status for {TARGET_AIRPORT} at {datetime.now(MY_TIMEZONE)}...")
+    current_time_str = datetime.now(MY_TIMEZONE).strftime('%I:%M %p %Z')
+    print(f"Checking status for {TARGET_AIRPORT} at {current_time_str}...")
     
     realtime_issues = check_realtime_status()
     future_plans = check_future_plans()
     send_heartbeat = is_heartbeat_time()
-    
-    # Logic:
-    # 1. If there are issues, ALWAYS send an alert (Overrides heartbeat text)
-    # 2. If NO issues, but it is heartbeat time, send "All Clear"
     
     if realtime_issues or future_plans:
         msg = f"✈️ **FAA Alert for {TARGET_AIRPORT}**\n"
@@ -101,11 +94,17 @@ if __name__ == "__main__":
         if future_plans:
             msg += "\n\n**Forecasted / Planning:**\n" + "\n".join(future_plans)
             
-        msg += f"\n\n*Checked at {datetime.now(MY_TIMEZONE).strftime('%I:%M %p %Z')}*"
+        msg += f"\n\n*Checked at {current_time_str}*"
         
         print("Found issues! Sending alert...")
         send_discord_alert(msg)
 
     elif send_heartbeat:
         msg = f"🟢 **Daily Heartbeat:** System Online.\nNo active delays at {TARGET_AIRPORT}."
-        msg += f"\n*Checked at {datetime.now(MY_TIMEZONE).strftime('%I:%M
+        msg += f"\n*Checked at {current_time_str}*"
+        
+        print("Sending Heartbeat...")
+        send_discord_alert(msg)
+        
+    else:
+        print("No issues and not heartbeat time. Staying silent.")
