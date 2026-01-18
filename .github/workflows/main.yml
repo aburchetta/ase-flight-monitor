@@ -4,7 +4,7 @@ on:
   schedule:
     # Runs every 10 minutes
     - cron: '*/10 * * * *'
-  workflow_dispatch: # Allows you to run it manually to test
+  workflow_dispatch:
 
 jobs:
   check_faa:
@@ -19,7 +19,8 @@ jobs:
           python-version: '3.9'
 
       - name: Install libraries
-        run: pip install requests xmltodict
+        # This line was missing 'pytz' before!
+        run: pip install requests xmltodict pytz
 
       - name: Run the scanner
         env:
