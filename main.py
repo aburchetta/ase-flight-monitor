@@ -5,7 +5,7 @@ import pytz
 from datetime import datetime
 
 # --- CONFIGURATION ---
-TARGET_AIRPORTS = ("ASE", "EGE", "DEN")
+TARGET_AIRPORT = ("ASE", "EGE", "DEN")
 STATUS_URL = "https://nasstatus.faa.gov/api/airport-status-information"
 PLAN_URL = "https://www.fly.faa.gov/adv/adv_spt.jsp"
 WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK")
